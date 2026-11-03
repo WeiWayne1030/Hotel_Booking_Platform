@@ -1,0 +1,48 @@
+## .NET Core
+bin/
+obj/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+## Visual Studio / VS Code / Rider
+.vs/
+.vscode/
+.idea/
+*.DotSettings.user
+
+## OS Generated
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+.DS_Store
+
+## Logs & Test Results
+TestResults/
+*.log
+
+## App Specific & Environment Variables
+appsettings.Development.json
+appsettings.Production.json
+appsettings.Staging.json
+appsettings.Local.json
+appsettings.Secrets.json
+secrets.json
+.env
+.env.*
+!.env.example
+
+## Certificates & Private Keys (嚴防憑證與私鑰上傳)
+*.pfx
+*.p12
+*.pem
+*.key
+*.cer
+*.crt
+*.publishsettings
+
+## Database / Dumps
+*.sql.gz
+*.dump
+
