@@ -2,6 +2,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\OTA.Modules.Inventory.Domain\OTA.Modules.Inventory.Domain.csproj" />
+    <ProjectReference Include="..\OTA.Modules.Inventory.Application\OTA.Modules.Inventory.Application.csproj" />
   </ItemGroup>
 
   <ItemGroup>

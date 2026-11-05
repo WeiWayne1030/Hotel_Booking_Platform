@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using OTA.Modules.Inventory.Application;
 using OTA.Modules.Inventory.Infrastructure.Database;
 
 namespace OTA.Modules.Inventory.Infrastructure;
@@ -29,6 +30,9 @@ public static class DependencyInjection
             // 與 CHECK constraint 及 docs/database-design.md 的命名一致
             .UseSnakeCaseNamingConvention();
         });
+
+        services.AddScoped<IInventoryStore, EfInventoryStore>();
+        services.AddScoped<HoldInventoryHandler>();
 
         return services;
     }

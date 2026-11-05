@@ -1,0 +1,16 @@
+# 本機開發用 PostgreSQL。密碼從 .env 讀取 (.env 已被 .gitignore 排除)
+services:
+  postgres:
+    image: postgres:16
+    container_name: ota-postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?請先複製 .env.example 為 .env 並設定密碼}
+      POSTGRES_DB: ota_hotel_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - ota_pgdata:/var/lib/postgresql/data
+
+volumes:
+  ota_pgdata:
