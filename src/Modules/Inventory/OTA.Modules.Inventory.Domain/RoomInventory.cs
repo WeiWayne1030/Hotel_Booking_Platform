@@ -63,8 +63,10 @@ public sealed class RoomInventory : AggregateRoot<Guid>
 
     private void Touch()
     {
-        // Version 的實際遞增交由資料庫層 (WHERE version = @v) 的opmistic lock處理，
-        // 這裡僅更新時間戳。
+        // 每次狀態發生變更時版號自增 +1。
+        // EF Core 會自動以載入時的舊版號發出: UPDATE ... WHERE id = @id AND version = @oldVersion
+        // 並將遞增後的新版號寫入資料庫
+        Version++;
         UpdatedAt = DateTimeOffset.UtcNow;
     }
 }
