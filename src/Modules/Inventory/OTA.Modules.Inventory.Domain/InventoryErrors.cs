@@ -26,6 +26,9 @@ public static class InventoryErrors
     public static readonly Error ConcurrencyConflict = Error.Conflict(
         "Inventory.ConcurrencyConflict", "庫存同時被其他請求更新，請重試。");
 
+    public static readonly Error HoldExpired = Error.Conflict(
+        "Inventory.HoldExpired", "佔位已逾期，付款時間晚於佔位到期時間。");
+
     public static readonly Error HoldNotActive = Error.Conflict(
         "Inventory.HoldNotActive", "佔位狀態不允許此操作。");
 }

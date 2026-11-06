@@ -45,13 +45,28 @@ public sealed class InventoryHold : AggregateRoot<Guid>
         };
     }
 
+    /// <summary>嚴格過期 (Strict Expiration)：到了 ExpiresAt 就算逾期，不含任何寬限。</summary>
     public bool IsExpired(DateTimeOffset now) =>
         Status == InventoryHoldStatus.Held && ExpiresAt <= now;
 
-    /// <summary>付款成功，佔位轉為永久確認。</summary>
-    public Result Confirm()
+    /// <summary>
+    /// 排程是否可以釋放此佔位：逾期後還要再等「寬限期 (Grace Period)」才釋放，
+    /// 讓在期限內付款、但 Webhook 稍晚才到的情況仍能確認成功。
+    /// </summary>
+    public bool IsReleasableBySweeper(DateTimeOffset now, TimeSpan gracePeriod) =>
+        Status == InventoryHoldStatus.Held && ExpiresAt + gracePeriod <= now;
+
+    /// <summary>
+    /// 付款成功，佔位轉為永久確認。
+    /// 以「實際付款時間」而非「收到通知的時間」判斷：付款時間晚於 ExpiresAt 即逾期，
+    /// 不論 Webhook 是否落在寬限期內。逾期付款改走 Late Payment Revalidation (重新佔位)。
+    /// </summary>
+    /// <param name="paidAt">金流平台回報的付款成功時間</param>
+    public Result Confirm(DateTimeOffset paidAt)
     {
         if (Status != InventoryHoldStatus.Held) return Result.Failure(InventoryErrors.HoldNotActive);
+        if (paidAt > ExpiresAt) return Result.Failure(InventoryErrors.HoldExpired);
+
         Status = InventoryHoldStatus.Confirmed;
         return Result.Success();
     }
