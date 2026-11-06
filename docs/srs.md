@@ -102,7 +102,7 @@ graph TD
    - 負責維護 `(HotelId, RoomTypeId, Date)` 維度的即時剩餘空房數與當日房價。
    - 負責高併發下的庫存扣減、佔位鎖定 (Hold) 與超時釋放 (Release)。
 3. **Booking Module (預訂訂單模組)**
-   - 負責購物預訂生命週期：`Created (待付款)` -> `Confirmed (已確認)` -> `Cancelled (已取消)` -> `Completed (已完成)`。
+   - 負責購物預訂生命週期：`PENDING_PAYMENT (待付款)` -> `CONFIRMED (已確認)` -> `COMPLETED (已完成)`；任何非終態皆可轉為 `CANCELLED (已取消)`。
    - 負責住客資料填寫、取消政策檢核、訂單號生成與冪等防重。
 4. **Payment & Notification Module (支付與通知模組)**
    - 串接第三方金流閘道 (Stripe / 綠界等) 與 Webhook 處理。
@@ -175,6 +175,10 @@ journey
 
 ### 3.3 挑戰三：佔位機制與超時自動釋放 (Inventory Holding & Auto-Release)
 - **業務規則**：旅客點選預訂後，庫存先被扣減或標記 Hold，系統保留 **15 分鐘**。若 15 分鐘內未完成付款，庫存必須自動退回。
+- **逾期政策**：採 **Strict Expiration + Grace Period + Late Payment Revalidation**（細節見 [functional-spec.md](functional-spec.md) 第 1.4 節）：
+  1. **Strict Expiration**：佔位到期時間一到即為逾期，是否「準時付款」以金流回報的**付款時間**判斷。
+  2. **Grace Period**：排程在逾期後再等一小段寬限期才釋放庫存，吸收 Webhook 延遲；寬限期不延長付款期限。
+  3. **Late Payment Revalidation**：逾期才付款時，重新檢查庫存與價格，仍可訂則重新佔位並確認，否則自動退款。
 - **學習實作方案**：
   - **方案 A (入門實作)**：定時排程 (Background Scheduled Task)，每分鐘掃描 `status = PENDING_PAYMENT AND created_at < NOW() - 15 mins` 的訂單，批次更新為已取消並加回庫存。
   - **方案 B (進階實作)**：Redis Key 過期通知 (Keyspace Notifications) 或延遲訊息隊列 (Delayed Message Queue / Dead Letter Exchange)，精準在 15 分鐘到期時觸發釋放事件。
@@ -189,6 +193,8 @@ journey
 ---
 
 ## 4. 詳細功能需求 (Functional Requirements)
+
+> 各需求的業務規則 (BR) 與驗收標準 (AC)、以及目前實作進度，請見 [functional-spec.md](functional-spec.md)。
 
 ### 4.1 Catalog 模組需求
 - **REQ-CAT-01 [飯店與房型查詢]**：

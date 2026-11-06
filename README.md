@@ -33,6 +33,8 @@
 OTA/
 ├── docs/                                    # 專案架構與需求文件
 │   ├── srs.md                               # 軟體需求規格說明書 (高併發與飯店預訂)
+│   ├── functional-spec.md                   # 功能需求 / 業務規則 / 驗收標準 與實作進度對照
+│   ├── adr/                                 # 架構決策紀錄 (Architecture Decision Records)
 │   └── database-design.md                   # 資料庫設計與 DDL 規格 (PostgreSQL)
 ├── src/
 │   ├── Host/

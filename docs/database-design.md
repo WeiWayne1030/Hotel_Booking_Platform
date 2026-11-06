@@ -79,7 +79,7 @@ erDiagram
         date check_out
         int room_count
         decimal total_amount
-        varchar status "PENDING, PAID, CANCELLED"
+        varchar status "PENDING_PAYMENT, CONFIRMED, CANCELLED, COMPLETED"
         timestamp expire_at
         timestamp created_at
     }
@@ -207,7 +207,7 @@ WHERE status = 'HELD';
 #### 5. `booking.bookings` (預訂主表)
 > **設計重點**：
 > 1. `idempotency_key` 唯一索引：同一個請求即使按兩次，資料庫直接擋下重覆插入。
-> 2. 訂單狀態機：`PENDING_PAYMENT` -> `PAID` -> `CANCELLED` / `COMPLETED`。
+> 2. 訂單狀態機：`PENDING_PAYMENT` -> `CONFIRMED` -> `COMPLETED`；非終態皆可 -> `CANCELLED`。
 
 ```sql
 CREATE SCHEMA IF NOT EXISTS booking;
