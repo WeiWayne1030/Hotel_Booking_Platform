@@ -33,6 +33,7 @@ public static class DependencyInjection
 
         services.AddScoped<IInventoryStore, EfInventoryStore>();
         services.AddScoped<HoldInventoryHandler>();
+        services.AddScoped<GetAvailabilityHandler>();
 
         return services;
     }
